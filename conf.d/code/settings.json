@@ -1,0 +1,72 @@
+{
+    /* == Workbench == */
+    "workbench.settings.useSplitJSON": true,
+    "workbench.settings.openDefaultKeybindings": true,
+    "workbench.colorTheme": "Min Light",
+    "workbench.iconTheme": "material-icon-theme",
+    "workbench.startupEditor": "newUntitledFile",
+
+    /* == Editor == */
+    "editor.suggestSelection": "first",
+    "editor.fontFamily": "Fira Code, Consolas, 'Courier New', monospace",
+    "editor.fontLigatures": true,
+    "editor.cursorBlinking": "phase",
+    "editor.cursorStyle": "line",
+    "editor.tabSize": 2,
+    "editor.useTabStops": false,
+    "editor.minimap.enabled": false,
+    "editor.lineNumbers": "relative",
+    "editor.rulers": [
+        {
+          "column": 80,
+          "color": "#00ff00"
+        },
+        100,  // <- a ruler in the default color or as customized at column 0
+      ], 
+    
+    /* == Explorer == */
+    "explorer.openEditors.visible": 0,
+    
+    /* == Files == */
+    "files.eol": "\n",
+    "files.autoSaveDelay": 1000,
+    "files.autoSave": "afterDelay",
+    
+    /* == NPM == */
+    "npm.enableScriptExplorer": true,
+
+    /* == Git == */
+    "git.enableSmartCommit": true,
+    
+    /* == Window == */
+    "window.zoomLevel": 0,
+    
+    /* == Terminal == */
+
+    /* == Extensions == */
+    
+    /* -- Remote -- */
+    "remote.SSH.remotePlatform": {
+    },
+    
+    /* -- IntelliCode -- */
+    "vsintellicode.modify.editor.suggestSelection": "automaticallyOverrodeDefaultValue",
+    
+    /* -- ThemeSwitch -- */
+    "themeswitch.directives": [
+        {
+            "time": "20:00",
+            "theme": "Min Dark"
+        },
+        {
+            "time": "07:00",
+            "theme": "Min Light"
+        }
+    ],
+
+    /* -- Latex -- */
+    "latex-workshop.view.pdf.viewer": "tab",
+    "ltex.language": "de-AT",
+    "vim.easymotion": true,
+    "vim.easymotionMarkerBackgroundColor": "#232323"
+}
