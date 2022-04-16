@@ -22,6 +22,11 @@
       "homebrew/core"
       "homebrew/cask"
     ];
+
+    masApps = {
+      WireGuard = 1451685025;
+      YubicoAuthenticator = 1497506650;
+    };
   };
 
   networking.hostName = "macbook";
