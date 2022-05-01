@@ -1,0 +1,29 @@
+
+name: nix-ci-cachix
+
+
+on:
+  pull_request:
+  push:
+    branches:
+      - main
+
+
+jobs:
+
+  build:
+    name: Build
+    runs-on: ubuntu-20.04
+
+    steps:
+      - uses: actions/checkout@v3
+
+      - uses: nixbuild/nix-quick-install-action@v13
+        with:
+          nix_conf: |
+            experimental-features = nix-command flakes
+      - name: Build Nix flake
+        working-directory: nix-ci
+        run: |
+          nix build -L \
+            .#qcow
