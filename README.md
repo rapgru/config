@@ -12,3 +12,18 @@ Steps:
 
 How to install flake when flake support is disabled by default?
 https://gist.github.com/jmatsushita/5c50ef14b4b96cb24ae5268dab613050
+
+### Borders of the nixified MacBook
+
+`nix-darwin` is only half the story when it comes to a declarative system
+configuration.
+
+- homebrew and mac app store programs
+- setting up shell-related software which requires system-wide installations
+  - gpg-agent
+  - VS Code
+  - shell itself
+- fonts
+- some development-related macos defaults
+- bootstrapping home-manager
+- managing `nix` and the nix daemon
