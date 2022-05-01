@@ -20,9 +20,9 @@ jobs:
             system-features = nixos-test benchmark big-parallel kvm
       - name: Build Nix flake
         run: |
-          nix build \
+          nix build -L \
             .#nixosConfigurations.installer-iso.config.system.build.isoImage
-            
+
       - run: echo "UPLOAD_PATH=$(readlink -f result)" >> $GITHUB_ENV
       - uses: actions/upload-artifact@v3
         with:
