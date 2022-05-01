@@ -16,6 +16,9 @@
       "visual-studio-code"
       "alacritty"
       "utm"
+      "lastpass"
+      "docker"
+      "obsidian"
     ];
 
     taps = [
@@ -24,7 +27,6 @@
     ];
 
     masApps = {
-      WireGuard = 1451685025;
       YubicoAuthenticator = 1497506650;
     };
   };
@@ -49,6 +51,20 @@
   users.users.rgruber.shell = pkgs.fish;
   users.users.rgruber.home = "/Users/rgruber";
 
+  system.defaults = {
+    NSGlobalDomain.NSAutomaticSpellingCorrectionEnabled = false;
+    NSGlobalDomain.KeyRepeat = 5;
+    NSGlobalDomain.NSAutomaticCapitalizationEnabled = false;
+    NSGlobalDomain.NSAutomaticQuoteSubstitutionEnabled = false;
+    NSGlobalDomain.NSAutomaticPeriodSubstitutionEnabled = false;
+    NSGlobalDomain.NSAutomaticDashSubstitutionEnabled = false;
+
+    dock.show-recents = false;
+
+    finder.AppleShowAllFiles = true;
+    finder.ShowPathbar = true;
+  };
+  
   fonts.enableFontDir = true;
   fonts.fonts = with pkgs; [
     emacs-all-the-icons-fonts
