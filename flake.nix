@@ -6,12 +6,14 @@
     nixpkgs-unstable.url = github:nixos/nixpkgs/nixpkgs-unstable;
     darwin.url = "github:lnl7/nix-darwin/master";
     home.url = "github:nix-community/home-manager";
+    nixos-generators.url = "github:nix-community/nixos-generators";
 
+    nixos-generators.inputs.nixpkgs.follows = "nixpkgs";
     darwin.inputs.nixpkgs.follows = "nixpkgs";
     home.inputs.nixpkgs.follows = "nixpkgs";
   };
 
-  outputs = { self, darwin, nixpkgs, home, ...}@inputs: {
+  outputs = { self, darwin, nixpkgs, nixos-generators, home, ...}@inputs: {
     darwinConfigurations.macbook = darwin.lib.darwinSystem {
       system = "aarch64-darwin";
       modules = [
@@ -41,6 +43,18 @@
           };
         }
       ];
+    };
+
+    packages.x86_64-linux = {
+      qcow = nixos-generators.nixosGenerate {
+        pkgs = nixpkgs.legacyPackages.x86_64-linux;
+        modules = [
+          # you can include your own nixos configuration here, i.e.
+          # ./configuration.nix
+          "${nixpkgs}/nixos/modules/installer/cd-dvd/installation-cd-base.nix"
+        ];
+        format = "qcow";
+      };
     };
   };
 }
