@@ -23,10 +23,9 @@ jobs:
         run: |
           nix build \
             .#qcow
-      - name: log result
-        run: |
-          ls -la result && find result
+
+      - run: echo "UPLOAD_PATH=$(readlink -f result)" >> $GITHUB_ENV
       - uses: actions/upload-artifact@v3
         with:
           name: nix-result
-          path: result/
+          path: ${{ env.UPLOAD_PATH }}

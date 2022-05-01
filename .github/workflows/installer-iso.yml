@@ -22,8 +22,9 @@ jobs:
         run: |
           nix build \
             .#nixosConfigurations.installer-iso.config.system.build.isoImage
-
+            
+      - run: echo "UPLOAD_PATH=$(readlink -f result)" >> $GITHUB_ENV
       - uses: actions/upload-artifact@v3
         with:
           name: nix-result
-          path: result/
+          path: ${{ env.UPLOAD_PATH }}
