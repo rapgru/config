@@ -1,5 +1,4 @@
-
-name: nix-build
+name: nix-build installer iso
 
 on:
   pull_request:
@@ -22,7 +21,8 @@ jobs:
       - name: Build Nix flake
         run: |
           nix build \
-            .#qcow
+            .#nixosConfigurations.installer-iso.config.system.build.isoImage
+
       - uses: actions/upload-artifact@v3
         with:
           name: nix-result

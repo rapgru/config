@@ -1,0 +1,29 @@
+
+name: nix-build qcow base image
+
+on:
+  pull_request:
+  push:
+    branches:
+      - main
+
+jobs:
+  build:
+    name: Build
+    runs-on: ubuntu-20.04
+
+    steps:
+      - uses: actions/checkout@v3
+      - uses: nixbuild/nix-quick-install-action@v13
+        with:
+          nix_conf: |
+            experimental-features = nix-command flakes
+            system-features = nixos-test benchmark big-parallel kvm
+      - name: Build Nix flake
+        run: |
+          nix build \
+            .#qcow
+      - uses: actions/upload-artifact@v3
+        with:
+          name: nix-result
+          path: result/
