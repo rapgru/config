@@ -21,7 +21,7 @@ jobs:
             system-features = nixos-test benchmark big-parallel kvm
       - name: Build Nix flake
         run: |
-          nix build -L \
+          nix build \
             .#qcow
       - uses: actions/upload-artifact@v3
         with:
