@@ -21,6 +21,10 @@
       "obsidian"
     ];
 
+    brews = [
+      "tailscale"
+    ];
+
     taps = [
       "homebrew/core"
       "homebrew/cask"
@@ -81,6 +85,7 @@
 
   environment.extraInit = ''
     export PATH="$PATH:/Applications/Visual Studio Code.app/Contents/Resources/app/bin"
+    export PATH="$PATH:/opt/homebrew/bin"
   '';
 
   # Use a custom configuration.nix location.
