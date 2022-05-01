@@ -1,5 +1,22 @@
 # Nix System Configurations
 
+## NixOS VMs
+
+### Bootstrapping process
+
+GitHub Actions build a qcow2 base image that can be imported in Synology
+Virtual Machine Manager as Disk Image.
+
+After being imported, the machines can be started and remotely
+configured with `deploy-rs` after networking is sorted out so that
+the machines are reachable under the hostnames `deploy-rs` uses.
+By default, the qcow2 image acquires IP addresses by means of DHCP.
+The preferred method of setting up networking are DHCP reservations, because
+the MAC addresses are unique per imported VM.
+
+Possibilities for bootstrapping `deploy-rs` configured machines in clouds
+has yet to be explored.
+
 ## Macbook
 
 Steps:
