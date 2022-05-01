@@ -22,6 +22,7 @@ jobs:
         with:
           nix_conf: |
             experimental-features = nix-command flakes
+            system-features = nixos-test benchmark big-parallel kvm
       - name: Build Nix flake
         run: |
           nix build -L \
