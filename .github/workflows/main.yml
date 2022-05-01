@@ -23,7 +23,6 @@ jobs:
           nix_conf: |
             experimental-features = nix-command flakes
       - name: Build Nix flake
-        working-directory: nix-ci
         run: |
           nix build -L \
             .#qcow
