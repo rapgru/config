@@ -1,6 +1,5 @@
 
-name: nix-ci-cachix
-
+name: nix-build
 
 on:
   pull_request:
@@ -8,16 +7,13 @@ on:
     branches:
       - main
 
-
 jobs:
-
   build:
     name: Build
     runs-on: ubuntu-20.04
 
     steps:
       - uses: actions/checkout@v3
-
       - uses: nixbuild/nix-quick-install-action@v13
         with:
           nix_conf: |
@@ -27,3 +23,7 @@ jobs:
         run: |
           nix build -L \
             .#qcow
+      - uses: actions/upload-artifact@v3
+        with:
+          name: nix-result
+          path: result/
