@@ -33,3 +33,17 @@ and then
 ```
 home-manager switch --flake .#rgruber
 ```
+### Borders of the nixified MacBook
+
+`nix-darwin` is only half the story when it comes to a declarative system
+configuration.
+
+- homebrew and mac app store programs
+- setting up shell-related software which requires system-wide installations
+  - gpg-agent
+  - VS Code
+  - shell itself
+- fonts
+- some development-related macos defaults
+- bootstrapping home-manager
+- managing `nix` and the nix daemon

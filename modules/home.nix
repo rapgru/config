@@ -26,6 +26,8 @@ in
     bat
     fd
     
+    ghq
+
   ] ++ lib.optionals stdenv.isDarwin [
     m-cli # useful macOS CLI commands
   ];
