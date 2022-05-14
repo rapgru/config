@@ -12,3 +12,24 @@ Steps:
 
 How to install flake when flake support is disabled by default?
 https://gist.github.com/jmatsushita/5c50ef14b4b96cb24ae5268dab613050
+
+## Lenovo
+
+WSL2 Ubuntu with `home-manager`, with a single-user nix install:
+
+```
+sh <(curl -L https://nixos.org/nix/install) --no-daemon
+```
+
+Initally apply config with
+
+```
+nix --extra-experimental-features "nix-command flakes" build .#homeConfigurations.rgruber.activationPackage
+result/activate
+```
+
+and then
+
+```
+home-manager switch --flake .#rgruber
+```

@@ -1,4 +1,4 @@
-{ config, pkgs, lib, ... }:
+{ identity, isWSL, inputs }: { config, pkgs, lib, ... }:
 
 let
   identities = lib.importJSON ../conf.d/secrets/identities.json;
@@ -25,27 +25,28 @@ in
     # deps for fish-fzf
     bat
     fd
-
+    
   ] ++ lib.optionals stdenv.isDarwin [
     m-cli # useful macOS CLI commands
   ];
 
-  programs.git = {
+  programs.git = lib.mkIf (!isWSL) {
     enable = true;
     userName = identities.name;
-    userEmail = identities.private.email;
-    signing.key = identities.private.pgp_keyid;
+    userEmail = identities.${identity}.email;
+    signing.key = identities.${identity}.pgp_keyid;
     signing.signByDefault = true;
     extraConfig.github.user = "rapgru";
   };
 
   programs.gpg = {
     enable = true;
-    publicKeys = [ { source = ../conf.d/secrets/private-pub.key; trust = 5; } ];
+    publicKeys = lib.mkIf (!isWSL) [ { source = ../conf.d/secrets/private-pub.key; trust = 5; } ];
     scdaemonSettings = {
       reader-port = "Yubico YubiKey OTP+FIDO+CCID";
       disable-ccid = true;
     };
+
   };
 
   programs.fzf = {
@@ -61,7 +62,7 @@ in
     nix-direnv.enable = true;
   };
 
-  programs.alacritty = {
+  programs.alacritty = lib.mkIf (!isWSL) {
     enable = true;
     settings = {
       window.padding.x = 15;
@@ -129,6 +130,8 @@ in
       ];
     };
   };
+  
+  programs.home-manager.enable = lib.mkIf isWSL true;
 
   programs.fish = {
     enable = true;
@@ -151,11 +154,91 @@ in
           sha256 = "wFH3be6eGaBpOGkbtyDrh2v3MNG4v51J07T41WiyXdo=";
         };
       }
+      {
+        name = "fish-docker";
+        src = pkgs.fetchFromGitHub {
+          owner = "halostatue";
+          repo = "fish-docker";
+          rev = "541aaa64367755d5a9890b54f9061879ca165027";
+          sha256 = "whdM0g+AnVNyGWIuew0nI9LGfkUmp9nTl7GjZRFmD0Y=";
+        };
+      }
     ];
     shellInit = ''
       ${pkgs.any-nix-shell}/bin/any-nix-shell fish --info-right | source
     '';
+    functions = {
+      ij_open = ''
+        fish -c "cd $argv; powershell.exe 'C:\\\"Program Files (x86)\"\JetBrains\\\"IntelliJ IDEA 2021.3.3\"\bin\idea64.exe' ."
+      '';
+      ij = ''
+        set project_path "$HOME/ghq/"(ghq list | fzf)
+        ij_open $project_path
+      '';
+      makelive = ''
+        while true
+          $argv
+          sleep 1
+          clear
+        end
+      '';
+      cg = ''
+        cd ~/ghq; cd (ghq list | fzf)
+      '';
+    };
   };
   
-  home.file."Library/Application Support/Code/User/settings.json".source = ../conf.d/code/settings.json;
+  home.file."Library/Application Support/Code/User/settings.json" =
+    lib.mkIf pkgs.stdenv.isDarwin {
+      source = ../conf.d/code/settings.json;
+    };
+
+  home.file."pinentry-wsl-ps1.sh" = lib.mkIf isWSL {
+    source = ../conf.d/wsl/pinentry-wsl-ps1.sh;
+    executable = true;
+  };
+
+  home.file.".gnupg/gpg-agent.conf" = lib.mkIf isWSL {
+    text = ''
+      pinentry-program /home/rgruber/pinentry-wsl-ps1.sh
+    '';
+  };
+
+  home.homeDirectory = "/home/rgruber";
+
+  nix = lib.mkIf isWSL {
+    
+    extraOptions = ''
+      experimental-features = nix-command flakes
+    '';
+
+    # workaround to enable config generation
+    # default value for sandbox is true
+    # see https://github.com/nix-community/home-manager/commit/bb860e3e119ee6d043896544de560cd05096a421
+    settings = {
+      sandbox = true;
+    };
+    
+    enable = true;
+    package = pkgs.nixFlakes;
+  };
+
+  xdg = lib.mkIf isWSL {
+    enable = true;
+  };
+
+  nixpkgs = lib.mkIf isWSL {
+    overlays = let
+      unstable = import inputs.nixpkgs-unstable {
+        system = "x86_64-linux";
+      };
+    in
+      [
+        (final: prev: {
+          
+          #sf-mono-liga-bin = pkgs.callPackage ./pkgs/sf-mono-liga-bin { };
+          fd = unstable.fd;
+        })
+      ];
+  };
 }

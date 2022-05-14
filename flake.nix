@@ -37,10 +37,39 @@
             useGlobalPkgs = true;
             useUserPackages = true;
             
-            users.rgruber = import ./modules/home.nix;
+            users.rgruber = import ./modules/home.nix {
+              inherit inputs;
+              identity = "private";
+              isWSL = false;
+            };
           };
         }
       ];
     };
+
+    homeConfigurations."rgruber" = home.lib.homeManagerConfiguration
+    (let
+      system = "x86_64-linux";
+      username = "rgruber";
+      configName = "rgruber";
+    in 
+     {
+      # Specify the path to your home configuration here
+      configuration = import ./modules/home.nix {
+        inherit inputs;
+        identity = "work";
+        isWSL = true;
+      };
+
+      inherit system username;
+      homeDirectory = "/home/${username}";
+      # Update the state version as needed.
+      # See the changelog here:
+      # https://nix-community.github.io/home-manager/release-notes.html#sec-release-21.05
+      stateVersion = "22.05";
+
+      # Optionally use extraSpecialArgs
+      # to pass through arguments to home.nix
+    });
   };
 }
