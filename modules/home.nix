@@ -206,7 +206,7 @@ in
     '';
   };
 
-  home.homeDirectory = "/home/rgruber";
+  home.homeDirectory = lib.mkIf isWSL "/home/rgruber";
 
   nix = lib.mkIf isWSL {
     
