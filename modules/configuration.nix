@@ -16,9 +16,11 @@
       "visual-studio-code"
       "alacritty"
       "utm"
-      "lastpass"
       "docker"
       "obsidian"
+      "homebrew/cask-drivers/synology-drive"
+      "vivaldi"
+      "emacs"
     ];
 
     brews = [
@@ -28,10 +30,12 @@
     taps = [
       "homebrew/core"
       "homebrew/cask"
+      "homebrew/cask-drivers"
     ];
 
     masApps = {
       YubicoAuthenticator = 1497506650;
+      Bitwarden = 1352778147;
     };
   };
 
