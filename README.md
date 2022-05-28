@@ -7,6 +7,14 @@
 GitHub Actions build a qcow2 base image that can be imported in Synology
 Virtual Machine Manager as Disk Image.
 
+To import:
+- Configure as desired
+- As Disk use the included 10GB disk from qcow with virtio and do not provision a new disk. Autoresizing is enabled
+  on boot so the disk can be resized later on.
+- Before booting the VM for the first time is a good time to make the storage
+  bigger
+- Start VM
+
 After being imported, the machines can be started and remotely
 configured with `deploy-rs` after networking is sorted out so that
 the machines are reachable under the hostnames `deploy-rs` uses.
@@ -16,6 +24,7 @@ the MAC addresses are unique per imported VM.
 
 Possibilities for bootstrapping `deploy-rs` configured machines in clouds
 has yet to be explored.
+
 
 ## Macbook
 
