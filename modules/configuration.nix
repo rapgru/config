@@ -20,17 +20,19 @@
       "obsidian"
       "homebrew/cask-drivers/synology-drive"
       "vivaldi"
-      "emacs"
+      "tla-plus-toolbox"
     ];
 
     brews = [
       "tailscale"
+      "emacs-plus"
     ];
 
     taps = [
       "homebrew/core"
       "homebrew/cask"
       "homebrew/cask-drivers"
+      "d12frosted/emacs-plus"
     ];
 
     masApps = {
@@ -49,6 +51,8 @@
   environment.systemPackages =
     [ pkgs.git # VS Code
       pkgs.git-crypt # VS Code
+      pkgs.coreutils # Emacs
+      pkgs.ripgrep # Emacs
     ];
 
   environment.shells = [
