@@ -290,9 +290,14 @@ in
     in
       import ./overlays.nix
       ++
-      [
+      lib.optionals isWSL [
         (final: prev: {
           alacritty = nixGLWrap prev.alacritty;
+        })
+      ]
+      ++
+      [
+        (final: prev: {
           fd = unstable.fd;
         })
         inputs.nixgl.overlay
