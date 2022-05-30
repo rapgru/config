@@ -7,13 +7,14 @@
     darwin.url = "github:lnl7/nix-darwin/master";
     home.url = "github:nix-community/home-manager";
     nixos-generators.url = "github:nix-community/nixos-generators";
+    nixgl.url = "github:rapgru/nixGL";
 
     nixos-generators.inputs.nixpkgs.follows = "nixpkgs";
     darwin.inputs.nixpkgs.follows = "nixpkgs";
     home.inputs.nixpkgs.follows = "nixpkgs";
   };
 
-  outputs = { self, darwin, nixpkgs, nixos-generators, home, ...}@inputs: {
+  outputs = { self, darwin, nixpkgs, nixos-generators, home, nixgl, ...}@inputs: {
     darwinConfigurations.macbook = darwin.lib.darwinSystem {
       system = "aarch64-darwin";
       modules = [

@@ -2,6 +2,38 @@
 
 let
   identities = lib.importJSON ../conf.d/secrets/identities.json;
+  #pureNixGL = (inputs.nixgl.pure { nvidiaVersion = "510.60.02"; nvidiaHash = "qADfwFSQeP2Mbo5ngO+47uh4cuYFXH9fOGpHaM4H4AM="; inherit pkgs; }).nixGLNvidia;
+  #nixGLWrap = pkg: pkgs.runCommand pkg.name { } ''
+  #  mkdir -p "$out"/bin
+  #  cat << EOF > "$out"/bin/${pkg.pname}
+  #  #!${pkgs.bash}/bin/bash
+  #  set -e
+  #  
+  #  ${pureNixGL}/bin/${pureNixGL.name} ${pkg}/bin/${pkg.pname}
+  #  EOF
+  #  chmod +x "$out"/bin/${pkg.pname}
+  #'';
+
+  nixGLNvidiaScript = pkgs.writeShellScriptBin "nixGLNvidia" ''
+    $(NIX_PATH=nixpkgs=${inputs.nixpkgs} nix-build ${inputs.nixgl} -A auto.nixGLNvidia --no-out-link)/bin/* "$@"
+  '';
+  nixGLIntelScript = pkgs.writeShellScriptBin "nixGLIntel" ''
+    $(NIX_PATH=nixpkgs=${inputs.nixpkgs} nix-build ${inputs.nixgl} -A nixGLIntel --no-out-link)/bin/* "$@"
+  '';
+  nixGL = pkgs.writeShellScriptBin "nixGL" ''
+    glxinfo|egrep "OpenGL vendor|OpenGL renderer"|grep "NVIDIA"
+    if [[ $? == 0 ]]
+    then
+      ${nixGLNvidiaScript}/bin/nixGLNvidia "$@"
+    else
+      ${nixGLIntelScript}/bin/nixGLIntel "$@"
+    fi
+  '';
+  nixGLWrap = pkg: pkgs.writeShellScriptBin pkg.pname ''
+   set -e
+   
+   ${nixGL}/bin/nixGL ${pkg}/bin/${pkg.pname} "$@"
+  '';
 in
 {
   home.stateVersion = "22.05";
@@ -28,27 +60,32 @@ in
     
     ghq
 
+    pass
+    bitwarden-cli
+    git-crypt
+    nixGL
   ] ++ lib.optionals stdenv.isDarwin [
     m-cli # useful macOS CLI commands
+  ] ++ lib.optionals isWSL [
   ];
 
-  programs.git = lib.mkIf (!isWSL) {
+  programs.git = {
     enable = true;
     userName = identities.name;
     userEmail = identities.${identity}.email;
     signing.key = identities.${identity}.pgp_keyid;
     signing.signByDefault = true;
     extraConfig.github.user = "rapgru";
+    extraConfig.credential.helper = "cache --timeout=28800";
   };
 
-  programs.gpg = {
+  programs.gpg = lib.mkIf (!isWSL) {
     enable = true;
-    publicKeys = lib.mkIf (!isWSL) [ { source = ../conf.d/secrets/private-pub.key; trust = 5; } ];
+    publicKeys =  [ { source = ../conf.d/secrets/private-pub.key; trust = 5; } ];
     scdaemonSettings = {
       reader-port = "Yubico YubiKey OTP+FIDO+CCID";
       disable-ccid = true;
     };
-
   };
 
   programs.fzf = {
@@ -64,12 +101,12 @@ in
     nix-direnv.enable = true;
   };
 
-  programs.alacritty = lib.mkIf (!isWSL) {
+  programs.alacritty = {
     enable = true;
     settings = {
       window.padding.x = 15;
       window.padding.y = 28;
-      window.decorations = "transparent";
+      #window.decorations = "transparent";
       window.dynamic_title = true;
       scrolling.history = 100000;
       live_config_reload = true;
@@ -78,7 +115,7 @@ in
       use_thin_strokes = true;
 
       font = {
-        size = 12;
+        size = if isWSL then 7 else 12;
         normal.family = "Fira Code";
       };
 
@@ -168,6 +205,7 @@ in
     ];
     shellInit = ''
       ${pkgs.any-nix-shell}/bin/any-nix-shell fish --info-right | source
+      fish_add_path /home/rgruber/.krew/bin
     '';
     functions = {
       ij_open = ''
@@ -187,6 +225,12 @@ in
       cg = ''
         cd ~/ghq; cd (ghq list | fzf)
       '';
+      keeplive = ''
+        while true
+            sleep 3
+            fish -c "$argv"
+        end
+      '';
     };
   };
   
@@ -195,18 +239,25 @@ in
       source = ../conf.d/code/settings.json;
     };
 
+  home.file.".config/Code/User/settings.json" =
+    lib.mkIf isWSL {
+      source = ../conf.d/code/settings.json;
+    };
+
   home.file."pinentry-wsl-ps1.sh" = lib.mkIf isWSL {
     source = ../conf.d/wsl/pinentry-wsl-ps1.sh;
     executable = true;
   };
 
-  home.file.".gnupg/gpg-agent.conf" = lib.mkIf isWSL {
-    text = ''
-      pinentry-program /home/rgruber/pinentry-wsl-ps1.sh
-    '';
-  };
+  # home.file.".gnupg/gpg-agent.conf" = lib.mkIf isWSL {
+  #   text = ''
+  #     pinentry-program /home/rgruber/pinentry-wsl-ps1.sh
+  #   '';
+  # };
 
   home.homeDirectory = lib.mkIf isWSL "/home/rgruber";
+
+  targets.genericLinux.enable = lib.mkIf isWSL true;
 
   nix = lib.mkIf isWSL {
     
@@ -227,20 +278,25 @@ in
 
   xdg = lib.mkIf isWSL {
     enable = true;
+    configFile."nixpkgs/overlays.nix".source = lib.mkIf isWSL ./overlays.nix;
   };
 
   nixpkgs = lib.mkIf isWSL {
+    config.allowUnfreePredicate = (_: true);
     overlays = let
       unstable = import inputs.nixpkgs-unstable {
         system = "x86_64-linux";
       };
     in
+      import ./overlays.nix
+      ++
       [
         (final: prev: {
-          
-          #sf-mono-liga-bin = pkgs.callPackage ./pkgs/sf-mono-liga-bin { };
+          alacritty = nixGLWrap prev.alacritty;
           fd = unstable.fd;
         })
+        inputs.nixgl.overlay
       ];
   };
+
 }
