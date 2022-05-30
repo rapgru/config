@@ -60,6 +60,13 @@ and then
 ```
 home-manager switch --flake .#rgruber
 ```
+e
+change shell with
+
+```
+chsh -s /home/rgruber/.nix-profile/bin/fish
+```
+
 ### Borders of the nixified MacBook
 
 `nix-darwin` is only half the story when it comes to a declarative system
