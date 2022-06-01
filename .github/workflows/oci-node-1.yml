@@ -13,16 +13,25 @@ jobs:
 
     steps:
       - uses: actions/checkout@v3
-      - uses: nixbuild/nix-quick-install-action@v13
-        with:
-          nix_conf: |
-            experimental-features = nix-command flakes
-            system-features = nixos-test benchmark big-parallel kvm
-      - name: Build Nix flake
-        run: |
-          nix build -L \
-            .#deploy.nodes.oci-aarm64-1.profiles.system.path
 
+      - uses: uraimo/run-on-arch-action@v2.1.1
+        name: Run commands
+        id: runcmd
+        with:
+          arch: aarch64
+          distro: ubuntu20.04
+
+          # Not required, but speeds up builds by storing container images in
+          # a GitHub package registry.
+          githubToken: ${{ github.token }}
+
+          install: |
+            apt-get update -q -y
+            curl -L https://nixos.org/nix/install | sh
+          run: |
+            nix build --extra-experimental-features "nix-command flakes" -L \
+              .#deploy.nodes.oci-aarm64-1.profiles.system.path
+              
       - run: echo "UPLOAD_PATH=$(readlink -f result)" >> $GITHUB_ENV
       - uses: actions/upload-artifact@v3
         with:
