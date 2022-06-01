@@ -27,11 +27,12 @@ jobs:
 
           install: |
             apt-get update -q -y
+            apt-get install -q -y curl
             curl -L https://nixos.org/nix/install | sh
           run: |
             nix build --extra-experimental-features "nix-command flakes" -L \
               .#deploy.nodes.oci-aarm64-1.profiles.system.path
-              
+
       - run: echo "UPLOAD_PATH=$(readlink -f result)" >> $GITHUB_ENV
       - uses: actions/upload-artifact@v3
         with:
