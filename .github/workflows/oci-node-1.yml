@@ -28,7 +28,7 @@ jobs:
           install: |
             apt-get update -q -y
             apt-get install -q -y curl bzip2
-            mkdir -m 0755 /nix && chown aaronlevin /nix
+            mkdir -m 0755 /nix && chown root /nix
             curl -L https://nixos.org/nix/install | sh
           run: |
             . .nix-profile/etc/profile.d/nix.sh && nix-channel --update && nix build --extra-experimental-features "nix-command flakes" -L \
