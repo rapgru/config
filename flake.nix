@@ -121,6 +121,22 @@
         "${nixpkgs}/nixos/modules/installer/cd-dvd/installation-cd-minimal.nix"
       ];
     };
+
+    nixosConfigurations.oci-aarm64-1 = nixpkgs.lib.nixosSystem {
+      system = "aarch64-linux";
+      modules = [ ./modules/system/cluster-node.nix ];
+    };
+
+    deploy.nodes.oci-aarm64-1 = {
+      hostname = "130.61.176.121";
+      profiles.system = {
+        user = "root";
+        path = deploy-rs.lib.x86_64-linux.activate.nixos self.nixosConfigurations.oci-aarm64-1;
+      };
+    };
+
+    # This is highly advised, and will prevent many possible mistakes
+    checks = builtins.mapAttrs (system: deployLib: deployLib.deployChecks self.deploy) deploy-rs.lib;
   } //
 
   flake-utils.lib.eachDefaultSystem
