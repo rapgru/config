@@ -8,13 +8,15 @@
     home.url = "github:nix-community/home-manager";
     nixos-generators.url = "github:nix-community/nixos-generators";
     nixgl.url = "github:guibou/nixGL";
+    flake-utils.url = "github:numtide/flake-utils";
+    deploy-rs.url = "github:serokell/deploy-rs";
 
     nixos-generators.inputs.nixpkgs.follows = "nixpkgs";
     darwin.inputs.nixpkgs.follows = "nixpkgs";
     home.inputs.nixpkgs.follows = "nixpkgs";
   };
 
-  outputs = { self, darwin, nixpkgs, nixos-generators, home, ...}@inputs: {
+  outputs = { self, darwin, nixpkgs, nixos-generators, home, flake-utils, deploy-rs, ...}@inputs: {
 
     darwinConfigurations.macbook = darwin.lib.darwinSystem (
     let
@@ -119,5 +121,15 @@
         "${nixpkgs}/nixos/modules/installer/cd-dvd/installation-cd-minimal.nix"
       ];
     };
-  };
+  } //
+
+  flake-utils.lib.eachDefaultSystem
+    (system:
+      let pkgs = nixpkgs.legacyPackages.${system}; in
+      {
+        devShell = pkgs.mkShell {
+          buildInputs = with pkgs; [ oci-cli deploy-rs.packages.${system}.default ];
+        };
+      }
+    );
 }
