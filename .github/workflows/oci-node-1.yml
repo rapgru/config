@@ -27,7 +27,7 @@ jobs:
 
           install: |
             apt-get update -q -y
-            apt-get install -q -y curl bzip2
+            apt-get install -q -y curl bzip2 xz
             mkdir -m 0755 /nix
             curl -L https://nixos.org/nix/install | sh
           run: |
