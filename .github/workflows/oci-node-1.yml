@@ -33,9 +33,12 @@ jobs:
           run: |
             . .nix-profile/etc/profile.d/nix.sh && nix-channel --update && nix build --extra-experimental-features "nix-command flakes" -L \
               .#deploy.nodes.oci-aarm64-1.profiles.system.path
+            mkdir resolved_result
+            cp -ra result/* resolved_result/
 
-      - run: echo "UPLOAD_PATH=$(readlink -f result)" >> $GITHUB_ENV
+      #- run: echo "UPLOAD_PATH=$(readlink -f result)" >> $GITHUB_ENV
       - uses: actions/upload-artifact@v3
         with:
           name: nix-result
-          path: ${{ env.UPLOAD_PATH }}
+          path: resolved_result
+          #path: ${{ env.UPLOAD_PATH }}
