@@ -27,10 +27,11 @@ jobs:
 
           install: |
             apt-get update -q -y
-            apt-get install -q -y curl
+            apt-get install -q -y curl bzip2
+            mkdir -m 0755 /nix && chown aaronlevin /nix
             curl -L https://nixos.org/nix/install | sh
           run: |
-            nix build --extra-experimental-features "nix-command flakes" -L \
+            . .nix-profile/etc/profile.d/nix.sh && nix-channel --update && nix build --extra-experimental-features "nix-command flakes" -L \
               .#deploy.nodes.oci-aarm64-1.profiles.system.path
 
       - run: echo "UPLOAD_PATH=$(readlink -f result)" >> $GITHUB_ENV
