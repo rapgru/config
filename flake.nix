@@ -58,10 +58,11 @@
     in 
      {
       # Specify the path to your home configuration here
-      configuration = import ./modules/home.nix {
-        inherit inputs;
+      configuration = import ./modules/home/common.nix {
+        inherit inputs system;
         identity = "work";
-        isWSL = true;
+        type = "generic-linux";
+        profiles = ["work"];
       };
 
       inherit system username;
@@ -74,6 +75,7 @@
       # Optionally use extraSpecialArgs
       # to pass through arguments to home.nix
     });
+
     packages.x86_64-linux = {
       qcow = nixos-generators.nixosGenerate {
         pkgs = nixpkgs.legacyPackages.x86_64-linux;
