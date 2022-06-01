@@ -1,4 +1,4 @@
-{ identity, type, profiles, inputs, system }: { config, pkgs, lib, ... }:
+{ identity, type, profiles ? [], inputs, system }: { config, pkgs, lib, ... }:
 
 let
   identities = lib.importJSON ../../conf.d/secrets/identities.json;
@@ -208,8 +208,6 @@ in
         inherit system;
       };
     in
-      import ../overlays.nix
-      ++
       [
         (final: prev: {
           inherit inputs unstable;

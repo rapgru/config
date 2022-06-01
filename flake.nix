@@ -7,54 +7,44 @@
     darwin.url = "github:lnl7/nix-darwin/master";
     home.url = "github:nix-community/home-manager";
     nixos-generators.url = "github:nix-community/nixos-generators";
-    nixgl.url = "github:rapgru/nixGL";
+    nixgl.url = "github:guibou/nixGL";
 
     nixos-generators.inputs.nixpkgs.follows = "nixpkgs";
     darwin.inputs.nixpkgs.follows = "nixpkgs";
     home.inputs.nixpkgs.follows = "nixpkgs";
   };
 
-  outputs = { self, darwin, nixpkgs, nixos-generators, home, nixgl, ...}@inputs: {
-    darwinConfigurations.macbook = darwin.lib.darwinSystem {
+  outputs = { self, darwin, nixpkgs, nixos-generators, home, ...}@inputs: {
+
+    darwinConfigurations.macbook = darwin.lib.darwinSystem (
+    let
       system = "aarch64-darwin";
+      username = "rgruber";
+    in
+    {
+      inherit system;
       modules = [
         ./modules/configuration.nix
-        ({ config, pkgs, lib, ... }: {
-          nixpkgs.overlays = let
-            unstable = import inputs.nixpkgs-unstable {
-              system = "aarch64-darwin";
-              #inherit (nixpkgsConfig) config;
-            };
-          in
-            [
-              (final: prev: {
-                
-                #sf-mono-liga-bin = pkgs.callPackage ./pkgs/sf-mono-liga-bin { };
-                fd = unstable.fd;
-              })
-            ];
-        })
         home.darwinModules.home-manager
         {
           home-manager = {
-            useGlobalPkgs = true;
+            useGlobalPkgs = false;
             useUserPackages = true;
             
-            users.rgruber = import ./modules/home.nix {
-              inherit inputs;
+            users."${username}" = import ./modules/home/common.nix {
+              inherit inputs system;
               identity = "private";
-              isWSL = false;
+              type = "darwin";
             };
           };
         }
       ];
-    };
+    });
 
     homeConfigurations."rgruber" = home.lib.homeManagerConfiguration
     (let
       system = "x86_64-linux";
       username = "rgruber";
-      configName = "rgruber";
     in 
      {
       # Specify the path to your home configuration here

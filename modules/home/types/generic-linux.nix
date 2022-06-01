@@ -60,7 +60,6 @@ in
 
 
   nixpkgs = {
-    config.allowUnfreePredicate = (_: true);
     overlays =
       [
         (final: prev: {

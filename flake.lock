@@ -46,15 +46,15 @@
         "nixpkgs": "nixpkgs"
       },
       "locked": {
-        "lastModified": 1652731300,
-        "narHash": "sha256-s36eYK2V3jJ86h/g2AhF8naAlFA7COhl30efcyrEadg=",
-        "owner": "rapgru",
+        "lastModified": 1653311504,
+        "narHash": "sha256-4/EOfhL9gRAhUlC57DEQyg74RrcXPG8TTUDF8G7l6OY=",
+        "owner": "guibou",
         "repo": "nixGL",
-        "rev": "7ba60dd27c10aba7495832c92c8c90bd2b11ed57",
+        "rev": "3214ffead3934d1d8873657fdde4a4527078f9f6",
         "type": "github"
       },
       "original": {
-        "owner": "rapgru",
+        "owner": "guibou",
         "repo": "nixGL",
         "type": "github"
       }

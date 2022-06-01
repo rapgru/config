@@ -1,6 +1,6 @@
 { config, pkgs, lib, ...} : {
 
-  programs.gpg = lib.mkIf (!isWSL) {
+  programs.gpg = {
     enable = true;
     publicKeys =  [ { source = ../../../conf.d/secrets/private-pub.key; trust = 5; } ];
     scdaemonSettings = {
@@ -10,10 +10,10 @@
   };
 
   home.file."Library/Application Support/Code/User/settings.json" = {
-    source = ../conf.d/code/settings.json;
+    source = ../../../conf.d/code/settings.json;
   };
 
   home.packages = [
-    pgks.m-cli # useful macOS CLI commands
+    pkgs.m-cli # useful macOS CLI commands
   ];
 }
