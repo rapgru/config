@@ -21,6 +21,7 @@
       "homebrew/cask-drivers/synology-drive"
       "vivaldi"
       "tla-plus-toolbox"
+      "audacity"
     ];
 
     brews = [
@@ -61,6 +62,7 @@
   ];
 
   users.users.rgruber.shell = pkgs.fish;
+  # TODO pass username
   users.users.rgruber.home = "/Users/rgruber";
 
   system.defaults = {
