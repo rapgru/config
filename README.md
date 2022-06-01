@@ -1,8 +1,15 @@
 # Nix System Configurations
 
-## NixOS VMs
+## Develop
 
-### Bootstrapping process
+On a machine with active home-manager
+```
+nix develop --command fish
+```
+
+## NixOs VMs
+
+### Bootstrap on Synology
 
 GitHub Actions build a qcow2 base image that can be imported in Synology
 Virtual Machine Manager as Disk Image.
@@ -25,6 +32,14 @@ the MAC addresses are unique per imported VM.
 Possibilities for bootstrapping `deploy-rs` configured machines in clouds
 has yet to be explored.
 
+### Bootstrap on OCI
+
+Include in cloud-init:
+
+```
+#include
+https://raw.githubusercontent.com/rapgru/config/master/cloud-init/cloud.init
+```
 
 ## Macbook
 
@@ -39,6 +54,21 @@ Steps:
 
 How to install flake when flake support is disabled by default?
 https://gist.github.com/jmatsushita/5c50ef14b4b96cb24ae5268dab613050
+
+### Borders of the nixified MacBook
+
+`nix-darwin` is only half the story when it comes to a declarative system
+configuration.
+
+- homebrew and mac app store programs
+- setting up shell-related software which requires system-wide installations
+  - gpg-agent
+  - VS Code
+  - shell itself
+- fonts
+- some development-related macos defaults
+- bootstrapping home-manager
+- managing `nix` and the nix daemon
 
 ## Lenovo
 
@@ -66,18 +96,3 @@ change shell with
 ```
 chsh -s /home/rgruber/.nix-profile/bin/fish
 ```
-
-### Borders of the nixified MacBook
-
-`nix-darwin` is only half the story when it comes to a declarative system
-configuration.
-
-- homebrew and mac app store programs
-- setting up shell-related software which requires system-wide installations
-  - gpg-agent
-  - VS Code
-  - shell itself
-- fonts
-- some development-related macos defaults
-- bootstrapping home-manager
-- managing `nix` and the nix daemon
