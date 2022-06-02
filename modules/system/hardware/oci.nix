@@ -6,8 +6,10 @@
     efiInstallAsRemovable = true;
     device = "nodev";
   };
-  fileSystems."/boot" = { device = "/dev/disk/by-uuid/87C6-DBD2"; fsType = "vfat"; };
+  fileSystems."/boot" = { device = "/dev/disk/by-uuid/1406-9CEC"; fsType = "vfat"; };
   boot.initrd.kernelModules = [ "nvme" ];
-  fileSystems."/" = { device = "/dev/sda1"; fsType = "ext4"; };
-
+  fileSystems."/" = { device = "/dev/sda3"; fsType = "xfs"; };
+  swapDevices = [
+    { device = "/dev/sda2"; }
+  ];
 }

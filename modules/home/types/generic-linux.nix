@@ -34,6 +34,13 @@ in
     source = ../../../conf.d/code/settings.json;
   };
 
+  home.file.".gnupg/gpg-agent.conf" = {
+    # TODO use variable for home directory
+    text = ''
+      enable-ssh-support
+    '';
+  };
+
   nix = {
     
     extraOptions = ''

@@ -122,21 +122,23 @@
       ];
     };
 
-    nixosConfigurations.oci-aarm64-1 = nixpkgs.lib.nixosSystem {
-      system = "aarch64-linux";
-      modules = [ ./modules/system/cluster-node.nix ];
-    };
+    colmena = {
+      meta = {
+        nixpkgs = import nixpkgs { system = "aarch64-linux"; };
+      };
 
-    deploy.nodes.oci-aarm64-1 = {
-      hostname = "130.61.176.121";
-      profiles.system = {
-        user = "root";
-        path = deploy-rs.lib.x86_64-linux.activate.nixos self.nixosConfigurations.oci-aarm64-1;
+      oci-aarm64-1 = { name, nodes, pkgs, ... }: {
+        deployment = {
+          targetHost = "138.2.141.132";
+          buildOnTarget = true;
+        };
+
+        imports = [
+          ./modules/system/cluster-node.nix
+        ];
       };
     };
 
-    # This is highly advised, and will prevent many possible mistakes
-    checks = builtins.mapAttrs (system: deployLib: deployLib.deployChecks self.deploy) deploy-rs.lib;
   } //
 
   flake-utils.lib.eachDefaultSystem
