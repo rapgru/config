@@ -208,6 +208,8 @@ in
         inherit system;
       };
     in
+      import ../overlays.nix
+      ++
       [
         (final: prev: {
           inherit inputs unstable;
