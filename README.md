@@ -40,6 +40,12 @@ Include in cloud-init:
 #include
 https://raw.githubusercontent.com/rapgru/config/master/cloud-init/cloud.init
 ```
+Swap page size needs to be adjusted after NixOS boots up. Execute on VMs manually:
+`swapon -f /dev/sda2`
+
+The reason for this is that the nixos-infect script issues `reboot` and
+the `swapon` command cannot be executed by cloud-init afterwards, as it is only
+run on first startup.
 
 ## Macbook
 

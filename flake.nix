@@ -127,11 +127,63 @@
         nixpkgs = import nixpkgs { system = "aarch64-linux"; };
       };
 
-      oci-aarm64-1 = { name, nodes, pkgs, ... }: {
+      oci-aarm64-1 = { name, nodes, pkgs, lib, ... }: {
         deployment = {
-          targetHost = "138.2.141.132";
+          targetHost = "130.162.34.11";
           buildOnTarget = true;
         };
+
+        networking.hostName = "nixos-oci-aarm64-1";
+
+        services.k3s.role = "server";
+        services.k3s.extraFlags = "--no-deploy traefik";
+        services.k3s.serverAddr = "";
+
+
+        imports = [
+          ./modules/system/cluster-node.nix
+        ];
+      };
+
+      oci-aarm64-2 = { name, nodes, pkgs, ... }: {
+        deployment = {
+          targetHost = "138.2.152.202";
+          buildOnTarget = true;
+        };
+
+        networking.hostName = "nixos-oci-aarm64-2";
+
+        services.k3s.role = "agent";
+
+        imports = [
+          ./modules/system/cluster-node.nix
+        ];
+      };
+
+      oci-aarm64-3 = { name, nodes, pkgs, ... }: {
+        deployment = {
+          targetHost = "130.162.236.193";
+          buildOnTarget = true;
+        };
+
+        networking.hostName = "nixos-oci-aarm64-3";
+
+        services.k3s.role = "agent";
+
+        imports = [
+          ./modules/system/cluster-node.nix
+        ];
+      };
+      
+      oci-aarm64-4 = { name, nodes, pkgs, ... }: {
+        deployment = {
+          targetHost = "141.147.60.164";
+          buildOnTarget = true;
+        };
+
+        networking.hostName = "nixos-oci-aarm64-4";
+
+        services.k3s.role = "agent";
 
         imports = [
           ./modules/system/cluster-node.nix
