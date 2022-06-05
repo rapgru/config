@@ -1,6 +1,5 @@
 { config, pkgs, lib, ... }: {
   imports = [
-    ./hardware/oci.nix
   ];
 
   boot.cleanTmpDir = true;
@@ -16,5 +15,9 @@
   services.k3s.enable = true;
   services.k3s.docker = false;
   services.k3s.token = lib.importJSON ../../conf.d/secrets/k3s.json;
-  services.k3s.serverAddr = lib.mkDefault "https://172.16.11.86:6443";
+  services.k3s.serverAddr = lib.mkDefault "https://172.16.11.210:6443";
+
+  networking.nameservers = [ "1.1.1.1" "9.9.9.9" ];
+
+  nixpkgs.config.allowUnfree = true;
 }
