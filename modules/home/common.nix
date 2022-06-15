@@ -43,6 +43,8 @@ in
     pass
     bitwarden-cli
     git-crypt
+
+    ripgrep
   ];
 
   programs.git = {
@@ -197,6 +199,7 @@ in
             fish -c "$argv"
         end
       '';
+      kuc = "kubectl config use-context $argv";
     };
   };
 

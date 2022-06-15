@@ -24,6 +24,7 @@ in
 
   home.packages = [
     nixGL
+    pkgs.unstable.emacs
   ];
 
   programs.alacritty.settings.font.size = 7;
