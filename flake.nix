@@ -122,32 +122,78 @@
       ];
     };
 
-    colmena = {
+    colmena = let
+      ociDomain = "sub06011811570.main.oraclevcn.com";
+    in
+    {
       meta = {
-        nixpkgs = import nixpkgs { system = "aarch64-linux"; };
+        nixpkgs = import inputs.nixpkgs-unstable { system = "aarch64-linux"; };
       };
 
       oci-aarm64-1 = { name, nodes, pkgs, lib, ... }: {
         deployment = {
-          targetHost = "130.162.34.11";
+          targetHost = "130.61.92.191";
           buildOnTarget = true;
         };
 
         networking.hostName = "nixos-oci-aarm64-1";
 
         services.k3s.role = "server";
-        services.k3s.extraFlags = "--no-deploy traefik";
+        services.k3s.extraFlags = "--no-deploy traefik --no-deploy=servicelb --flannel-backend=none --disable-network-policy";
         services.k3s.serverAddr = "";
 
+        networking.firewall = {
+          allowedUDPPorts = [ 51820 ];
+        };
+
+        networking.wireguard.interfaces = {
+          # "wg0" is the network interface name. You can name the interface arbitrarily.
+          wg0 = {
+            # Determines the IP address and subnet of the server's end of the tunnel interface.
+            ips = [ "172.16.15.1/30" ];
+
+            # The port that WireGuard listens to. Must be accessible by the client.
+            listenPort = 51820;
+
+            # This allows the wireguard server to route your traffic to the internet and hence be like a VPN
+            # For this to work you have to set the dnsserver IP of your router (or dnsserver of choice) in your clients
+            # postSetup = ''
+            #   ${pkgs.iptables}/bin/iptables -t nat -A POSTROUTING -s 10.100.0.0/24 -o eth0 -j MASQUERADE
+            # '';
+
+            # This undoes the above command
+            # postShutdown = ''
+            #  ${pkgs.iptables}/bin/iptables -t nat -D POSTROUTING -s 10.100.0.0/24 -o eth0 -j MASQUERADE
+            # '';
+
+            # Path to the private key file.
+            #
+            # Note: The private key can also be included inline via the privateKey option,
+            # but this makes the private key world-readable; thus, using privateKeyFile is
+            # recommended.
+            privateKey = lib.importJSON ./conf.d/secrets/wg-oci-home/private.json;
+
+            peers = [
+              # List of allowed peers.
+              { # Feel free to give a meaning full name
+                # Public key of the peer (not a file path).
+                publicKey = "Q1lm/7WKl6hl4ck2CGeCsOw5FaO7arx741S4RsxwDHE=";
+                # List of IPs assigned to this peer within the tunnel subnet. Used to configure routing.
+                allowedIPs = [ "172.16.15.2/32" ];
+              }
+            ];
+          };
+        };
 
         imports = [
           ./modules/system/cluster-node.nix
+          ./modules/system/hardware/oci-ubuntu.nix
         ];
       };
 
       oci-aarm64-2 = { name, nodes, pkgs, ... }: {
         deployment = {
-          targetHost = "138.2.152.202";
+          targetHost = "141.147.47.17";
           buildOnTarget = true;
         };
 
@@ -157,12 +203,13 @@
 
         imports = [
           ./modules/system/cluster-node.nix
+          ./modules/system/hardware/oci-ubuntu.nix
         ];
       };
 
       oci-aarm64-3 = { name, nodes, pkgs, ... }: {
         deployment = {
-          targetHost = "130.162.236.193";
+          targetHost = "141.147.62.61";
           buildOnTarget = true;
         };
 
@@ -172,12 +219,13 @@
 
         imports = [
           ./modules/system/cluster-node.nix
+          ./modules/system/hardware/oci-ubuntu.nix
         ];
       };
-      
+
       oci-aarm64-4 = { name, nodes, pkgs, ... }: {
         deployment = {
-          targetHost = "141.147.60.164";
+          targetHost = "130.61.251.116";
           buildOnTarget = true;
         };
 
@@ -187,8 +235,9 @@
 
         imports = [
           ./modules/system/cluster-node.nix
+          ./modules/system/hardware/oci-ubuntu.nix
         ];
-      };
+      }; 
     };
 
   } //
