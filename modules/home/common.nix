@@ -29,6 +29,8 @@ in
     ./types/generic-linux.nix
   ] ++ lib.optionals (lib.elem "work" profiles) [
     ./profiles/work.nix
+  ] ++ lib.optionals (lib.elem "kde-i3" profiles) [
+    ./profiles/kde-i3.nix
   ];
 
   home.packages = with pkgs; [

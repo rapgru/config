@@ -54,7 +54,7 @@
         inherit inputs system;
         identity = "work";
         type = "generic-linux";
-        profiles = ["work"];
+        profiles = ["work" "kde-i3"];
       };
 
       inherit system username;
