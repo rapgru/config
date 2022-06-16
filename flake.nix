@@ -26,7 +26,7 @@
     {
       inherit system;
       modules = [
-        ./modules/configuration.nix
+        ./modules/system/darwin.nix
         home.darwinModules.home-manager
         {
           home-manager = {
