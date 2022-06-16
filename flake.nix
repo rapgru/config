@@ -132,14 +132,14 @@
 
       oci-aarm64-1 = { name, nodes, pkgs, lib, ... }: {
         deployment = {
-          targetHost = "130.61.92.191";
+          targetHost = "oci-node-1.glob.k8s.rapgru.com";
           buildOnTarget = true;
         };
 
         networking.hostName = "nixos-oci-aarm64-1";
 
         services.k3s.role = "server";
-        services.k3s.extraFlags = "--no-deploy traefik --no-deploy=servicelb --flannel-backend=none --disable-network-policy";
+        services.k3s.extraFlags = "--no-deploy traefik";
         services.k3s.serverAddr = "";
 
         networking.firewall = {
@@ -193,7 +193,7 @@
 
       oci-aarm64-2 = { name, nodes, pkgs, ... }: {
         deployment = {
-          targetHost = "141.147.47.17";
+          targetHost = "oci-node-2.glob.k8s.rapgru.com";
           buildOnTarget = true;
         };
 
@@ -209,7 +209,7 @@
 
       oci-aarm64-3 = { name, nodes, pkgs, ... }: {
         deployment = {
-          targetHost = "141.147.62.61";
+          targetHost = "oci-node-3.glob.k8s.rapgru.com";
           buildOnTarget = true;
         };
 
@@ -225,7 +225,7 @@
 
       oci-aarm64-4 = { name, nodes, pkgs, ... }: {
         deployment = {
-          targetHost = "130.61.251.116";
+          targetHost = "oci-node-4.glob.k8s.rapgru.com";
           buildOnTarget = true;
         };
 
