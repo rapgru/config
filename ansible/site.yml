@@ -1,0 +1,59 @@
+---
+
+- import_playbook: k3s-ansible/site.yml
+  tags: [ "k3s" ]
+
+- name: Firewall
+  hosts: master
+  become: yes
+  tasks:
+    - name: Allow input for kube-api
+      ansible.builtin.iptables:
+        chain: INPUT
+        protocol: tcp
+        destination_port: 6443
+        jump: ACCEPT
+        action: insert
+        rule_num: 6
+        ctstate: NEW
+  handlers:
+  - name: Persist iptables
+    command: "netfilter-persistent save"
+
+- name: Firewall
+  hosts: master
+  become: yes
+  tasks:
+    - name: Allow input for kube-api
+      ansible.builtin.iptables:
+        chain: INPUT
+        protocol: tcp
+        destination_port: 6443
+        jump: ACCEPT
+        action: insert
+        rule_num: 6
+        ctstate: NEW
+  handlers:
+  - name: Persist iptables
+    command: "netfilter-persistent save"
+
+- name: Cilium CLI
+  hosts: master
+  become: yes
+  tasks:
+    - name: Install
+      ansible.builtin.unarchive:
+        src: https://github.com/cilium/cilium-cli/releases/latest/download/cilium-linux-arm64.tar.gz
+        dest: /usr/local/bin
+        remote_src: yes
+
+- name: rp_filter
+  hosts: all
+  become: yes
+  tasks:
+    - name: Add sysctl
+      copy:
+        content: |
+          net.ipv4.conf.default.rp_filter = 0
+          net.ipv4.conf.*.rp_filter = 0
+        dest: /etc/sysctl.d/90-override.conf
