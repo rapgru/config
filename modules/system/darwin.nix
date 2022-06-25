@@ -22,6 +22,8 @@
       "vivaldi"
       "tla-plus-toolbox"
       "audacity"
+      "garmin-express"
+      "aldente"
     ];
 
     brews = [

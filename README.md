@@ -47,6 +47,10 @@ The reason for this is that the nixos-infect script issues `reboot` and
 the `swapon` command cannot be executed by cloud-init afterwards, as it is only
 run on first startup.
 
+The boot partition is only 100 MB on OCI, this forces one to delete all
+installed kernels before applying a NixOS configuration that performs a
+kernel upgrade. The script `rm-kernels.sh` helps with that.
+
 ## Macbook
 
 Steps:
