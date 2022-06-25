@@ -122,9 +122,7 @@
       ];
     };
 
-    colmena = let
-      ociDomain = "sub06011811570.main.oraclevcn.com";
-    in
+    colmena =
     {
       meta = {
         nixpkgs = import inputs.nixpkgs-unstable { system = "aarch64-linux"; };
@@ -132,18 +130,22 @@
 
       oci-aarm64-1 = { name, nodes, pkgs, lib, ... }: {
         deployment = {
-          targetHost = "oci-node-1.glob.k8s.rapgru.com";
+          targetHost = "bastion.rapgru.com";
           buildOnTarget = true;
         };
 
-        networking.hostName = "nixos-oci-aarm64-1";
-
-        services.k3s.role = "server";
-        services.k3s.extraFlags = "--no-deploy traefik";
-        services.k3s.serverAddr = "";
+        networking.hostName = "nixos-oci-aarm64-bastion";
 
         networking.firewall = {
-          allowedUDPPorts = [ 51820 ];
+          allowedUDPPorts = [ 51820 51821 ];
+          enable = false;
+        };
+
+        #networking.dhcpcd.runHook = "ip route add 172.16.10.0/24 172.16.15.2"
+
+        boot.kernel.sysctl = {
+          # if you use ipv4, this is all you need
+          "net.ipv4.conf.all.forwarding" = true;
         };
 
         networking.wireguard.interfaces = {
@@ -179,65 +181,41 @@
                 # Public key of the peer (not a file path).
                 publicKey = "Q1lm/7WKl6hl4ck2CGeCsOw5FaO7arx741S4RsxwDHE=";
                 # List of IPs assigned to this peer within the tunnel subnet. Used to configure routing.
-                allowedIPs = [ "172.16.15.2/32" ];
+                allowedIPs = [ "172.16.15.2/32" "172.16.10.0/24" ];
+              }
+            ];
+          };
+          wg1 = {
+            ips = [ "172.16.16.1/24" ];
+            listenPort = 51821;
+
+            # This allows the wireguard server to route your traffic to the internet and hence be like a VPN
+            # For this to work you have to set the dnsserver IP of your router (or dnsserver of choice) in your clients
+            postSetup = ''
+              ip route change 172.16.10.0/24 via 172.16.15.2 dev wg0
+            '';
+
+            # This undoes the above command
+            # postShutdown = ''
+            #  ${pkgs.iptables}/bin/iptables -t nat -D POSTROUTING -s 10.100.0.0/24 -o eth0 -j MASQUERADE
+            # '';
+
+            privateKey = lib.importJSON ./conf.d/secrets/wg-remote/private.json;
+
+            peers = [
+              { # Mobile
+                publicKey = "1IZdTMYUh5ShrmRo+SIIjDZ3vGZZT/kJsDwvMFzxY1k=";
+                allowedIPs = [ "172.16.16.10/32" ];
               }
             ];
           };
         };
 
         imports = [
-          ./modules/system/cluster-node.nix
           ./modules/system/hardware/oci-ubuntu.nix
+          ./modules/system/cluster-node.nix
         ];
       };
-
-      oci-aarm64-2 = { name, nodes, pkgs, ... }: {
-        deployment = {
-          targetHost = "oci-node-2.glob.k8s.rapgru.com";
-          buildOnTarget = true;
-        };
-
-        networking.hostName = "nixos-oci-aarm64-2";
-
-        services.k3s.role = "agent";
-
-        imports = [
-          ./modules/system/cluster-node.nix
-          ./modules/system/hardware/oci-ubuntu.nix
-        ];
-      };
-
-      oci-aarm64-3 = { name, nodes, pkgs, ... }: {
-        deployment = {
-          targetHost = "oci-node-3.glob.k8s.rapgru.com";
-          buildOnTarget = true;
-        };
-
-        networking.hostName = "nixos-oci-aarm64-3";
-
-        services.k3s.role = "agent";
-
-        imports = [
-          ./modules/system/cluster-node.nix
-          ./modules/system/hardware/oci-ubuntu.nix
-        ];
-      };
-
-      oci-aarm64-4 = { name, nodes, pkgs, ... }: {
-        deployment = {
-          targetHost = "oci-node-4.glob.k8s.rapgru.com";
-          buildOnTarget = true;
-        };
-
-        networking.hostName = "nixos-oci-aarm64-4";
-
-        services.k3s.role = "agent";
-
-        imports = [
-          ./modules/system/cluster-node.nix
-          ./modules/system/hardware/oci-ubuntu.nix
-        ];
-      }; 
     };
 
   } //
