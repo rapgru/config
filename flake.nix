@@ -137,8 +137,21 @@
         networking.hostName = "nixos-oci-aarm64-bastion";
 
         networking.firewall = {
-          allowedUDPPorts = [ 51820 51821 ];
-          enable = false;
+          allowedUDPPorts = [ 51820 51821 53 ];
+        };
+
+        services.dnsmasq = {
+          enable = true;
+          extraConfig = let srv = "172.16.10.10"; in ''
+            server=1.1.1.1
+            address=/dsm.rapgru.com/${srv}
+            address=/dashboard.rapgru.com/${srv}
+            address=/portainer.rapgru.com/${srv}
+            address=/git.rapgru.com/${srv}
+            address=/calibre.rapgru.com/${srv}
+            address=/paperless.rapgru.com/${srv}
+            address=/vault.rapgru.com/${srv}
+          '';
         };
 
         #networking.dhcpcd.runHook = "ip route add 172.16.10.0/24 172.16.15.2"
@@ -193,12 +206,13 @@
             # For this to work you have to set the dnsserver IP of your router (or dnsserver of choice) in your clients
             postSetup = ''
               ip route change 172.16.10.0/24 via 172.16.15.2 dev wg0
+              ${pkgs.iptables}/bin/iptables -t nat -A POSTROUTING -s 172.16.16.0/24 -o enp0s3 -j MASQUERADE
             '';
 
             # This undoes the above command
-            # postShutdown = ''
-            #  ${pkgs.iptables}/bin/iptables -t nat -D POSTROUTING -s 10.100.0.0/24 -o eth0 -j MASQUERADE
-            # '';
+            postShutdown = ''
+              ${pkgs.iptables}/bin/iptables -t nat -D POSTROUTING -s 172.16.16.0/24 -o enp0s3 -j MASQUERADE
+            '';
 
             privateKey = lib.importJSON ./conf.d/secrets/wg-remote/private.json;
 
@@ -206,6 +220,10 @@
               { # Mobile
                 publicKey = "1IZdTMYUh5ShrmRo+SIIjDZ3vGZZT/kJsDwvMFzxY1k=";
                 allowedIPs = [ "172.16.16.10/32" ];
+              }
+              { # Macbook
+                publicKey = "s/RqyU56aFmPu/+hiynaLa/yw3joV6qL5LtFo3d1zTU=";
+                allowedIPs = [ "172.16.16.11/32" ];
               }
             ];
           };
