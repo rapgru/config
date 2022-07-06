@@ -225,6 +225,10 @@
                 publicKey = "s/RqyU56aFmPu/+hiynaLa/yw3joV6qL5LtFo3d1zTU=";
                 allowedIPs = [ "172.16.16.11/32" ];
               }
+              { # Lenovo
+                publicKey = "1dSxPkXNX+Ms2oQgJWRocE+Cv9ET+ge8pX0m2eiSclI=";
+                allowedIPs = [ "172.16.16.12/32" ];
+              }
             ];
           };
         };
