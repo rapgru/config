@@ -128,6 +128,20 @@
         nixpkgs = import inputs.nixpkgs-unstable { system = "aarch64-linux"; };
       };
 
+      alexandria-node-1 = { name, nodes, pkgs, lib, ... }: {
+        deployment = {
+          targetHost = "alexandria-node-1.rapgru.com";
+          buildOnTarget = true;
+        };
+
+        networking.hostName = "alexandria-node-1";
+
+        imports = [
+          ./modules/system/hardware/synology-vm.nix
+          ./modules/system/cluster-node.nix
+        ];
+      };
+
       oci-aarm64-1 = { name, nodes, pkgs, lib, ... }: {
         deployment = {
           targetHost = "bastion.rapgru.com";
@@ -151,6 +165,7 @@
             address=/calibre.rapgru.com/${srv}
             address=/paperless.rapgru.com/${srv}
             address=/vault.rapgru.com/${srv}
+            address=/alexandria-node-1.rapgru.com/172.16.20.10
           '';
         };
 
@@ -194,7 +209,7 @@
                 # Public key of the peer (not a file path).
                 publicKey = "Q1lm/7WKl6hl4ck2CGeCsOw5FaO7arx741S4RsxwDHE=";
                 # List of IPs assigned to this peer within the tunnel subnet. Used to configure routing.
-                allowedIPs = [ "172.16.15.2/32" "172.16.10.0/24" ];
+                allowedIPs = [ "172.16.15.2/32" "172.16.10.0/24" "172.16.20.0/24" ];
               }
             ];
           };
