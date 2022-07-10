@@ -12,5 +12,7 @@
   
   networking.nameservers = [ "1.1.1.1" "9.9.9.9" ];
 
+  programs.htop.enable = true;
+
   nixpkgs.config.allowUnfree = true;
 }

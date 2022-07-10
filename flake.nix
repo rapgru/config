@@ -96,36 +96,67 @@
       };
     };
 
-    nixosConfigurations."installer-iso" = nixpkgs.lib.nixosSystem {
-      system = "x86_64-linux";
-      modules = [
-        ({ pkgs, ... }: {
-          nix.extraOptions = "experimental-features = nix-command flakes";
-          nix.package = pkgs.nix; # If you're still on 21.11
+    images.rpi2 = nixosConfigurations.rpi2.config.system.build.sdImage;
 
-          programs.fish.enable = true;
-          users.defaultUserShell = pkgs.fish;
+    nixosConfigurations = {
+      rpi2 = nixpkgs.lib.nixosSystem {
+        system = "armv7l-linux";
+        modules = [
+          "${nixpkgs}/nixos/modules/installer/sd-card/sd-image-raspberrypi.nix"
+          {
+            nixpkgs.config.allowUnsupportedSystem = true;
+            nixpkgs.crossSystem.system = "armv7l-linux";
+            # ... extra configs as above
+            services.openssh = {
+              enable = true;
+              passwordAuthentication = false;
+              permitRootLogin = "yes";
+            };
 
-          services.openssh = {
-            enable = true;
-            passwordAuthentication = false;
-            permitRootLogin = "yes";
-          };
+            users.users."root".openssh.authorizedKeys.keys = [
+              "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAACAQDqt4kenF3gehfHhTbH1Un9Yc5ClKzHPkuA/7VCkSvq8tI+qrA5JJajuh7MpmGrNVh+aQ88oHOC1fqMJ4XdxJxc3zcvKcaueI78CfqV0MqzSkZADmthlbEonJsh1usgHx+IOxtELPVLw39qTflsHLlAq8gO1mOuQ+pI9TAPnzME6qTafPhkLiTr00S8cW6xcl7dpw0BnGGbEBNiS5ofsbzIYQQfTj1iO/GSBoEMYamJGcsxFdgnqtyZdmctiHjRX/8esOSwL5vbrdklOVJM4ES8U62m5XS3oihnEzBJkKlPWKvvE2cJgdIQGgT5fpl6dQWG8a8jqHU5A7nn2M50sG9mpF0bZupzR6Vg4E8yenEZa2ct06caE4rqlx0CRa3mZexFyqTgS90t3duuyI/NMp8e9lzS5QYWzwBSoYIexA6Q6py5fqE464PeBwsHi6QD8o3+IGPxLME0B8W/lQywHt+YvpHqlm52FqVcjaqrh5Ew3EOYBMrgFbsraChRPdVpWPIVPTVJ6LkwhLkrx33TeO/PnTseNs4AtupKZXDk9jEzC9LYkSHhANTsLo6ZRwXnmjXSjRKAvvQkOZdp2vHg/4IdRVa4OoF2cNHkIVG/sqCKV/HQTppIyqyA8vuwz4Wa2BTLabzjYveI7E+Tw3RF6ocx03FksfwD3Kq+EX8DnCgMWw== cardno:000615587769"
+              # note: ssh-copy-id will add user@clientmachine after the public key
+              # but we can remove the "@clientmachine" part
+            ];
+          }
+        ];
+      };
+      "installer-iso" = nixpkgs.lib.nixosSystem {
+        system = "x86_64-linux";
+        modules = [
+          ({ pkgs, ... }: {
+            nix.extraOptions = "experimental-features = nix-command flakes";
+            nix.package = pkgs.nix; # If you're still on 21.11
 
-          users.users."root".openssh.authorizedKeys.keys = [
-            "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAACAQDqt4kenF3gehfHhTbH1Un9Yc5ClKzHPkuA/7VCkSvq8tI+qrA5JJajuh7MpmGrNVh+aQ88oHOC1fqMJ4XdxJxc3zcvKcaueI78CfqV0MqzSkZADmthlbEonJsh1usgHx+IOxtELPVLw39qTflsHLlAq8gO1mOuQ+pI9TAPnzME6qTafPhkLiTr00S8cW6xcl7dpw0BnGGbEBNiS5ofsbzIYQQfTj1iO/GSBoEMYamJGcsxFdgnqtyZdmctiHjRX/8esOSwL5vbrdklOVJM4ES8U62m5XS3oihnEzBJkKlPWKvvE2cJgdIQGgT5fpl6dQWG8a8jqHU5A7nn2M50sG9mpF0bZupzR6Vg4E8yenEZa2ct06caE4rqlx0CRa3mZexFyqTgS90t3duuyI/NMp8e9lzS5QYWzwBSoYIexA6Q6py5fqE464PeBwsHi6QD8o3+IGPxLME0B8W/lQywHt+YvpHqlm52FqVcjaqrh5Ew3EOYBMrgFbsraChRPdVpWPIVPTVJ6LkwhLkrx33TeO/PnTseNs4AtupKZXDk9jEzC9LYkSHhANTsLo6ZRwXnmjXSjRKAvvQkOZdp2vHg/4IdRVa4OoF2cNHkIVG/sqCKV/HQTppIyqyA8vuwz4Wa2BTLabzjYveI7E+Tw3RF6ocx03FksfwD3Kq+EX8DnCgMWw== cardno:000615587769"
-            # note: ssh-copy-id will add user@clientmachine after the public key
-            # but we can remove the "@clientmachine" part
-          ];
-        })
-        "${nixpkgs}/nixos/modules/installer/cd-dvd/installation-cd-minimal.nix"
-      ];
+            programs.fish.enable = true;
+            users.defaultUserShell = pkgs.fish;
+
+            services.openssh = {
+              enable = true;
+              passwordAuthentication = false;
+              permitRootLogin = "yes";
+            };
+
+            users.users."root".openssh.authorizedKeys.keys = [
+              "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAACAQDqt4kenF3gehfHhTbH1Un9Yc5ClKzHPkuA/7VCkSvq8tI+qrA5JJajuh7MpmGrNVh+aQ88oHOC1fqMJ4XdxJxc3zcvKcaueI78CfqV0MqzSkZADmthlbEonJsh1usgHx+IOxtELPVLw39qTflsHLlAq8gO1mOuQ+pI9TAPnzME6qTafPhkLiTr00S8cW6xcl7dpw0BnGGbEBNiS5ofsbzIYQQfTj1iO/GSBoEMYamJGcsxFdgnqtyZdmctiHjRX/8esOSwL5vbrdklOVJM4ES8U62m5XS3oihnEzBJkKlPWKvvE2cJgdIQGgT5fpl6dQWG8a8jqHU5A7nn2M50sG9mpF0bZupzR6Vg4E8yenEZa2ct06caE4rqlx0CRa3mZexFyqTgS90t3duuyI/NMp8e9lzS5QYWzwBSoYIexA6Q6py5fqE464PeBwsHi6QD8o3+IGPxLME0B8W/lQywHt+YvpHqlm52FqVcjaqrh5Ew3EOYBMrgFbsraChRPdVpWPIVPTVJ6LkwhLkrx33TeO/PnTseNs4AtupKZXDk9jEzC9LYkSHhANTsLo6ZRwXnmjXSjRKAvvQkOZdp2vHg/4IdRVa4OoF2cNHkIVG/sqCKV/HQTppIyqyA8vuwz4Wa2BTLabzjYveI7E+Tw3RF6ocx03FksfwD3Kq+EX8DnCgMWw== cardno:000615587769"
+              # note: ssh-copy-id will add user@clientmachine after the public key
+              # but we can remove the "@clientmachine" part
+            ];
+          })
+          "${nixpkgs}/nixos/modules/installer/cd-dvd/installation-cd-minimal.nix"
+        ];
+      };
     };
 
     colmena =
     {
       meta = {
         nixpkgs = import inputs.nixpkgs-unstable { system = "aarch64-linux"; };
+
+        nodeNixpkgs = {
+          alexandria-node-1 = import inputs.nixpkgs-unstable { system = "x86_64-linux"; };
+          alexandria-node-2 = import inputs.nixpkgs-unstable { system = "x86_64-linux"; };
+        };
       };
 
       alexandria-node-1 = { name, nodes, pkgs, lib, ... }: {
@@ -134,7 +165,84 @@
           buildOnTarget = true;
         };
 
+        networking.firewall = {
+          allowedTCPPorts = [ 4646 4647 ] ++ [ 8301 8302 8300 8600 8500];
+          allowedUDPPorts = [ 8301 8302 8600 ];
+        };
+
         networking.hostName = "alexandria-node-1";
+
+        services.consul = {
+          enable = true;
+          extraConfig = {
+            retry_join = ["172.16.20.11"];
+          };
+        };
+
+        boot.kernel.sysctl = {
+          "net.bridge.bridge-nf-call-arptables" = 1;
+          "net.bridge.bridge-nf-call-ip6tables" = 1;
+          "net.bridge.bridge-nf-call-iptables" = 1;
+        };
+
+        services.nomad = {
+          enable = true;
+          enableDocker = true;
+          settings = {
+            client = {
+              enabled = true;
+            };
+          };
+        };
+
+        imports = [
+          ./modules/system/hardware/synology-vm.nix
+          ./modules/system/cluster-node.nix
+        ];
+      };
+
+      alexandria-node-2 = { name, nodes, pkgs, lib, ... }: {
+        deployment = {
+          targetHost = "alexandria-node-2.rapgru.com";
+          buildOnTarget = true;
+        };
+
+        networking.firewall = {
+          allowedTCPPorts = [ 4646 4647 4648 ] ++ [8301 8302 8300 8600 8500 ];
+          allowedUDPPorts = [ 8301 8302 8600 ];
+        };
+
+        services.consul = {
+          enable = true;
+          webUi = true;
+          extraConfig = {
+            server = true;
+            bootstrap_expect = 1;
+            client_addr = "0.0.0.0";
+          };
+        };
+
+        services.nomad = {
+          enable = true;
+          enableDocker = true;
+          settings = {
+            server = {
+              enabled = true;
+              bootstrap_expect = 1; # for demo; no fault tolerance
+            };
+            client = {
+              enabled = true;
+            };
+          };
+        };
+
+        boot.kernel.sysctl = {
+          "net.bridge.bridge-nf-call-arptables" = 1;
+          "net.bridge.bridge-nf-call-ip6tables" = 1;
+          "net.bridge.bridge-nf-call-iptables" = 1;
+        };
+
+        networking.hostName = "alexandria-node-2";
 
         imports = [
           ./modules/system/hardware/synology-vm.nix
@@ -166,6 +274,7 @@
             address=/paperless.rapgru.com/${srv}
             address=/vault.rapgru.com/${srv}
             address=/alexandria-node-1.rapgru.com/172.16.20.10
+            address=/alexandria-node-2.rapgru.com/172.16.20.11
           '';
         };
 
@@ -221,6 +330,7 @@
             # For this to work you have to set the dnsserver IP of your router (or dnsserver of choice) in your clients
             postSetup = ''
               ip route change 172.16.10.0/24 via 172.16.15.2 dev wg0
+              ip route change 172.16.20.0/24 via 172.16.15.2 dev wg0
               ${pkgs.iptables}/bin/iptables -t nat -A POSTROUTING -s 172.16.16.0/24 -o enp0s3 -j MASQUERADE
             '';
 
