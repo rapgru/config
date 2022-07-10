@@ -18,7 +18,7 @@ jobs:
         id: runcmd
         with:
           arch: armv7
-          distro: ubuntu-20.04
+          distro: ubuntu20.04
 
           # Not required, but speeds up builds by storing container images in
           # a GitHub package registry.
@@ -26,9 +26,15 @@ jobs:
 
           # Set an output parameter `uname` for use in subsequent steps
           run: |
-            sh <(curl -L https://nixos.org/nix/install)
+            curl -Lo RELEASE https://raw.githubusercontent.com/nixbuild/nix-quick-install-action/master/RELEASE
 
-            echo "experimental-features = nix-command flakes" >> ~/.config/nix/nix.config
+            export RELEASE_FILE="RELEASE"
+            export NIX_VERSION="2.9.1"
+            export NIX_CONF="experimental-features = nix-command flakes"
+            export NIX_ON_TMPFS="false"
+
+            curl -L https://raw.githubusercontent.com/nixbuild/nix-quick-install-action/master/nix-quick-install.sh | bash
+
             nix build -L \
               .#images.rpi2
       
