@@ -141,6 +141,8 @@
           buildOnTarget = true;
         };
 
+        environment.systemPackages = with pkgs; [ cni-plugins cifs-utils ];
+
         networking.firewall = {
           allowedTCPPorts = [ 4646 4647 ] ++ [ 8301 8302 8300 8600 8500];
           allowedUDPPorts = [ 8301 8302 8600 ];
@@ -164,16 +166,26 @@
         services.nomad = {
           enable = true;
           enableDocker = true;
+          dropPrivileges = false;
+          extraPackages = with pkgs; [ cifs-utils ];
           settings = {
             client = {
               enabled = true;
+              cni_path = "${pkgs.cni-plugins}/bin";
+            };
+            plugin = {
+              docker = {
+                config = {
+                  allow_privileged = true;
+                };
+              };
             };
           };
         };
 
         imports = [
+          ./modules/system/server.nix
           ./modules/system/hardware/synology-vm.nix
-          ./modules/system/cluster-node.nix
         ];
       };
 
@@ -182,6 +194,8 @@
           targetHost = "alexandria-node-2.rapgru.com";
           buildOnTarget = true;
         };
+
+        environment.systemPackages = with pkgs; [ cni-plugins cifs-utils ];
 
         networking.firewall = {
           allowedTCPPorts = [ 4646 4647 4648 ] ++ [8301 8302 8300 8600 8500 ];
@@ -201,6 +215,8 @@
         services.nomad = {
           enable = true;
           enableDocker = true;
+          dropPrivileges = false;
+          extraPackages = with pkgs; [ cifs-utils ];
           settings = {
             server = {
               enabled = true;
@@ -208,6 +224,14 @@
             };
             client = {
               enabled = true;
+              cni_path = "${pkgs.cni-plugins}/bin";
+            };
+            plugin = {
+              docker = {
+                config = {
+                  allow_privileged = true;
+                };
+              };
             };
           };
         };
@@ -222,7 +246,7 @@
 
         imports = [
           ./modules/system/hardware/synology-vm.nix
-          ./modules/system/cluster-node.nix
+          ./modules/system/server.nix
         ];
       };
 
@@ -336,7 +360,7 @@
 
         imports = [
           ./modules/system/hardware/oci-ubuntu.nix
-          ./modules/system/cluster-node.nix
+          ./modules/system/server.nix
         ];
       };
     };
