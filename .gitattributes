@@ -1,1 +1,2 @@
 conf.d/secrets/** filter=git-crypt diff=git-crypt
+nomad/volumes/** filter=git-crypt diff=git-crypt
