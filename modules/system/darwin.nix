@@ -24,6 +24,7 @@
       "audacity"
       "garmin-express"
       "aldente"
+      "scroll-reverser"
     ];
 
     brews = [
@@ -41,6 +42,7 @@
     masApps = {
       YubicoAuthenticator = 1497506650;
       Bitwarden = 1352778147;
+      Wireguard = 1451685025;
     };
   };
 
