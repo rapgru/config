@@ -13,18 +13,27 @@ jobs:
 
     steps:
       - uses: actions/checkout@v3
-      - uses: nixbuild/nix-quick-install-action@v13
+      - uses: uraimo/run-on-arch-action@v2
+        name: Run commands
+        id: runcmd
         with:
-          nix_conf: |
-            experimental-features = nix-command flakes
-            system-features = nixos-test benchmark big-parallel kvm
-      - name: Build Nix flake
-        run: |
-          nix build -L \
-            .#images.rpi2
+          arch: armv7
+          distro: ubuntu-20.04
 
-      - run: echo "UPLOAD_PATH=$(readlink -f result)" >> $GITHUB_ENV
-      - uses: actions/upload-artifact@v3
-        with:
-          name: nix-result
-          path: ${{ env.UPLOAD_PATH }}
+          # Not required, but speeds up builds by storing container images in
+          # a GitHub package registry.
+          githubToken: ${{ github.token }}
+
+          # Set an output parameter `uname` for use in subsequent steps
+          run: |
+            sh <(curl -L https://nixos.org/nix/install)
+
+            echo "experimental-features = nix-command flakes" >> ~/.config/nix/nix.config
+            nix build -L \
+              .#images.rpi2
+      
+      # - run: echo "UPLOAD_PATH=$(readlink -f result)" >> $GITHUB_ENV
+      # - uses: actions/upload-artifact@v3
+      #   with:
+      #     name: nix-result
+      #     path: ${{ env.UPLOAD_PATH }}
