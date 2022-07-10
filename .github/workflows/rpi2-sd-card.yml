@@ -1,4 +1,4 @@
-name: nix-build installer iso
+name: rpi2 arm7 sd card
 
 on:
   pull_request:

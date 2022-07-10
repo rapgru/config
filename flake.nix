@@ -16,7 +16,7 @@
     home.inputs.nixpkgs.follows = "nixpkgs";
   };
 
-  outputs = { self, darwin, nixpkgs, nixos-generators, home, flake-utils, deploy-rs, ...}@inputs: {
+  outputs = { self, darwin, nixpkgs, nixos-generators, home, flake-utils, deploy-rs, ...}@inputs: rec {
 
     darwinConfigurations.macbook = darwin.lib.darwinSystem (
     let
