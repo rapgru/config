@@ -13,6 +13,7 @@ jobs:
 
     steps:
       - uses: actions/checkout@v3
+      - run: echo "$USER"
       - uses: uraimo/run-on-arch-action@v2
         name: Run commands
         id: runcmd
@@ -26,14 +27,9 @@ jobs:
 
           # Set an output parameter `uname` for use in subsequent steps
           run: |
-            curl -Lo RELEASE https://raw.githubusercontent.com/nixbuild/nix-quick-install-action/master/RELEASE
+            apt-get update && apt-get install -qy curl
 
-            export RELEASE_FILE="RELEASE"
-            export NIX_VERSION="2.9.1"
-            export NIX_CONF="experimental-features = nix-command flakes"
-            export NIX_ON_TMPFS="false"
-
-            curl -L https://raw.githubusercontent.com/nixbuild/nix-quick-install-action/master/nix-quick-install.sh | bash
+            sh <(curl -L https://nixos.org/nix/install)
 
             nix build -L \
               .#images.rpi2
